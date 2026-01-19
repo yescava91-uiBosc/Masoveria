@@ -8,252 +8,202 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --primary: #3d5a40; /* Verde Masovería */
-            --accent: #70a1ff; /* Celeste estancias */
-            --bg: #fdfcf8;
-            --text: #2d3436;
-            --white: #ffffff;
-            --danger: #d63031;
-            --success: #27ae60;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
-
-        /* Loader */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); z-index: 2000; display: flex; justify-content: center; align-items: center; transition: 0.5s; }
-
-        /* Nav Inferior Estilo HabitNow */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: var(--white); display: flex; justify-content: space-around;
-            align-items: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000;
-            border-radius: 20px 20px 0 0;
-        }
-        .nav-item { text-align: center; color: #a4b0be; cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: var(--primary); transform: translateY(-5px); }
-        .nav-item i { font-size: 24px; display: block; margin-bottom: 4px; }
-        .nav-item span { font-size: 10px; font-weight: 600; text-transform: uppercase; }
-
-        .section { display: none; padding: 25px 20px; animation: slideUp 0.4s ease; }
+        :root { --primary: #3d5a40; --accent: #70a1ff; --bg: #fdfcf8; --text: #2d3436; --white: #ffffff; --danger: #d63031; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 80px; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--white); z-index: 2000; display: flex; justify-content: center; align-items: center; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--white); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000; border-radius: 20px 20px 0 0; }
+        .nav-item { text-align: center; color: #a4b0be; flex: 1; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 24px; display: block; }
+        .section { display: none; padding: 20px; animation: fadeIn 0.3s; }
         .section.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        h2 { font-size: 1.6rem; color: var(--primary); margin-bottom: 5px; }
-        .subtitle { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 25px; display: block; }
-
-        /* Cards */
-        .card { background: var(--white); border-radius: 18px; padding: 18px; margin-bottom: 15px; box-shadow: 0 8px 15px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); }
-        
-        /* Tareas */
-        .task-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f2f6; }
-        .task-row:last-child { border: none; }
-        .task-row.done span { text-decoration: line-through; color: #b2bec3; }
-        .priority { width: 4px; height: 25px; border-radius: 10px; }
-
-        /* Voluntarios en Calendario */
-        .vol-card { min-width: 140px; background: #eef2f3; padding: 12px; border-radius: 12px; margin-right: 10px; border: 2px solid transparent; transition: 0.3s; }
-        .vol-card.active { border-color: var(--accent); background: #f0f7ff; }
-        .vol-name { font-weight: 600; font-size: 0.9rem; display: block; }
-        .vol-info { font-size: 0.75rem; color: #636e72; }
-
-        /* Forms */
-        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #dfe6e9; border-radius: 12px; background: #f9f9f9; font-size: 1rem; }
-        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 600; margin-top: 10px; }
-
-        #calendar { min-height: 400px; margin-top: 15px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card { background: var(--white); border-radius: 18px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .vol-card { min-width: 150px; background: #eef2f3; padding: 12px; border-radius: 12px; margin-right: 10px; cursor: pointer; border: 2px solid transparent; }
+        .vol-card.selected { border-color: var(--accent); background: #e3f2fd; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; }
+        button { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 5px; }
+        #calendar { background: white; padding: 10px; border-radius: 15px; }
     </style>
 </head>
 <body>
 
-    <div id="loader"><img src="https://i.gifer.com/ZZ5H.gif" width="50"></div>
+<div id="loader"><img src="https://i.gifer.com/ZZ5H.gif" width="40"></div>
 
-    <div id="sec-tareas" class="section active">
-        <h2>Tareas</h2>
-        <span class="subtitle">Tasks Management</span>
-        
-        <div class="card" id="diarias-cont">
-            <h4 style="margin-bottom:10px">Diarias / Daily</h4>
-            <div id="lista-diarias"></div>
-        </div>
+<div id="sec-tareas" class="section active">
+    <h2>Tareas / Tasks</h2>
+    <div id="cont-tareas-diarias"></div>
+    <h4 style="margin-top:20px">General</h4>
+    <div id="cont-tareas-general"></div>
+</div>
 
-        <h4 style="margin: 20px 0 10px">General</h4>
-        <div id="lista-general"></div>
+<div id="sec-calendario" class="section">
+    <h2>Calendario</h2>
+    <div id="vol-list" style="display: flex; overflow-x: auto; margin-bottom: 15px;"></div>
+    <div id="calendar"></div>
+    <div class="card" style="margin-top:20px">
+        <h4>Request Day Off / Solicitar Día</h4>
+        <select id="sol-voluntario"></select>
+        <input type="date" id="sol-fecha">
+        <button onclick="enviarSolicitudLibre()">Solicitar / Request</button>
     </div>
+</div>
 
-    <div id="sec-calendario" class="section">
-        <h2>Calendario</h2>
-        <span class="subtitle">Calendar & Volunteers</span>
-        
-        <div id="vol-list" style="display: flex; overflow-x: auto; padding-bottom: 10px;"></div>
-        <div id="calendar" class="card"></div>
-
-        <div class="card" style="margin-top:20px">
-            <h4>Solicitar Día Libre / Request Day Off</h4>
-            <select id="sol-voluntario"></select>
-            <input type="date" id="sol-fecha">
-            <button onclick="enviarSolicitudLibre()">Enviar Solicitud / Send Request</button>
+<div id="sec-compras" class="section">
+    <h2>Compras / Shopping</h2>
+    <p style="font-size:0.8rem; color:orange">Check pantry first / Revisa despensa primero</p>
+    <div id="cont-compras" style="margin-top:15px"></div>
+    <div class="card">
+        <select id="com-voluntario"></select>
+        <input type="text" id="com-art" placeholder="Item / Artículo">
+        <div style="display:flex; gap:5px">
+            <input type="number" id="com-cant" placeholder="Qty">
+            <select id="com-uni"><option>un</option><option>kg</option><option>paq</option><option>lts</option></select>
         </div>
+        <button onclick="agregarALista()" style="background:#636e72">Add to list / Añadir</button>
+        <button onclick="guardarTodo()" style="margin-top:10px">Save / Guardar</button>
+        <button onclick="limpiarCompras()" style="background:var(--danger); margin-top:10px">Clear / Limpiar</button>
     </div>
+</div>
 
-    <div id="sec-compras" class="section">
-        <h2>Compras</h2>
-        <span class="subtitle">Shopping List</span>
-        <div class="card" style="background: #fff9e6; border: 1px solid #ffeaa7;">
-            <p style="font-size: 0.8rem; color: #d35400;">⚠️ Revisa la despensa antes de pedir.<br>Check the pantry before ordering.</p>
-        </div>
-        
-        <div id="cont-compras"></div>
+<div id="sec-tickets" class="section">
+    <h2>Tickets PQRS</h2>
+    <div id="cont-tickets"></div>
+    <div class="card">
+        <select id="pqr-voluntario"></select>
+        <select id="pqr-tipo">
+            <option value="IP">Ideas/Proyectos</option>
+            <option value="DI">Daño/Incidencia</option>
+            <option value="S">Sugerencia</option>
+        </select>
+        <textarea id="pqr-msg" placeholder="Describe..."></textarea>
+        <button onclick="enviarTicket()">Send / Enviar</button>
+    </div>
+</div>
 
-        <div class="card">
-            <h4>Añadir Artículo / Add Item</h4>
-            <select id="com-voluntario"></select>
-            <input type="text" id="com-art" placeholder="¿Qué necesitas? / What do you need?">
-            <div style="display:flex; gap:10px">
-                <input type="number" id="com-cant" placeholder="Cant." style="flex:1">
-                <select id="com-uni" style="flex:1">
-                    <option value="un">un</option>
-                    <option value="kg">kg</option>
-                    <option value="lts">lts</option>
-                    <option value="paq">paq</option>
-                </select>
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="nav('sec-tareas', this)"><i class="bi bi-check2-square"></i><span>Tareas</span></div>
+    <div class="nav-item" onclick="nav('sec-calendario', this)"><i class="bi bi-calendar3"></i><span>Calendar</span></div>
+    <div class="nav-item" onclick="nav('sec-compras', this)"><i class="bi bi-cart3"></i><span>Market</span></div>
+    <div class="nav-item" onclick="nav('sec-tickets', this)"><i class="bi bi-chat-dots"></i><span>Tickets</span></div>
+</nav>
+
+<script>
+    const API = "https://script.google.com/macros/s/AKfycbxBK0kLLRFuhectkf2qLbGh8jxggXB5c1C1IyYJYN_CCQ86u-_DnqX7f63ddUIkv0s/exec";
+    let store = {};
+    let calendar;
+
+    async function init() {
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({action: 'getAppData'}) });
+        const d = await r.json();
+        store = d.data;
+        renderAll();
+        document.getElementById('loader').style.display = 'none';
+    }
+
+    function nav(id, el) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+        if(id === 'sec-calendario') { setTimeout(() => calendar.render(), 100); }
+    }
+
+    function renderAll() {
+        const vols = store.Voluntarios.slice(1);
+        const vHtml = vols.map(v => `<option value="${v[1]}">${v[1]}</option>`).join('');
+        ['sol-voluntario', 'com-voluntario', 'pqr-voluntario'].forEach(id => document.getElementById(id).innerHTML = vHtml);
+
+        // Calendario Voluntarios Tarjetas
+        document.getElementById('vol-list').innerHTML = vols.map(v => `
+            <div class="vol-card" onclick="highlightVol('${v[1]}','${v[3]}','${v[4]}', this)">
+                <strong>${v[1]}</strong><br><small>${v[2]}<br>Until: ${v[4]}</small>
             </div>
-            <button onclick="agregarALista()" style="background:#636e72">Añadir a lista / Add</button>
-            <div style="display:flex; gap:10px">
-                <button onclick="guardarTodo()" style="flex:2">Guardar / Save</button>
-                <button onclick="limpiarCompras()" style="flex:1; background:var(--danger)">Limpiar / Clear</button>
-            </div>
-        </div>
-    </div>
+        `).join('');
 
-    <div id="sec-tickets" class="section">
-        <h2>Tickets</h2>
-        <span class="subtitle">Maintenance & Ideas</span>
-        <div id="lista-tickets"></div>
-        <div class="card">
-            <h4>Nuevo Ticket / New Ticket</h4>
-            <select id="pqr-voluntario"></select>
-            <select id="pqr-tipo">
-                <option value="IP">Ideas o Proyectos (IP)</option>
-                <option value="DI">Daño o Incidencia (DI)</option>
-                <option value="S">Sugerencia (S)</option>
-            </select>
-            <textarea id="pqr-msg" rows="3" placeholder="Describe el asunto..."></textarea>
-            <button onclick="enviarTicket()">Crear Ticket / Create</button>
-        </div>
-    </div>
+        // Tareas
+        const tAll = store.DB_Tareas.slice(1);
+        document.getElementById('cont-tareas-general').innerHTML = tAll.filter(t => t[5] !== 'Hecho').map(t => `
+            <div class="card" onclick="cambiarEstadoTarea('${t[0]}')"><b>${t[1]}</b> - ${t[4]}</div>
+        `).join('');
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="nav('sec-tareas', this)"><i class="bi bi-check2-circle"></i><span>Tareas</span></div>
-        <div class="nav-item" onclick="nav('sec-calendario', this)"><i class="bi bi-calendar3"></i><span>Calendar</span></div>
-        <div class="nav-item" onclick="nav('sec-compras', this)"><i class="bi bi-cart3"></i><span>Market</span></div>
-        <div class="nav-item" onclick="nav('sec-tickets', this)"><i class="bi bi-chat-right-dots"></i><span>Tickets</span></div>
-    </nav>
+        // Compras y Tickets (similares)
+        renderCompras();
+        renderCalendar();
+    }
 
-    <script>
-        const API = "https://script.google.com/macros/s/AKfycbxBK0kLLRFuhectkf2qLbGh8jxggXB5c1C1IyYJYN_CCQ86u-_DnqX7f63ddUIkv0s/exec";
-        let store = { voluntarios: [], tareas: [], calendario: [], compras: [], pqr: [] };
+    function renderCalendar() {
+        const calEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calEl, {
+            initialView: 'dayGridMonth', locale: 'es',
+            events: store.DB_Calendario.slice(1).map(e => ({ title: e[1], start: e[2], end: e[3], color: e[4] === 'Verde' ? '#27ae60' : '#d63031' })),
+            dateClick: function(info) { mostrarDetalleDia(info.dateStr); }
+        });
+        calendar.render();
+    }
 
-        async function init() {
-            try {
-                const r = await fetch(API, { method: 'POST', body: JSON.stringify({action: 'getAppData'}) });
-                const d = await r.json();
-                store = { 
-                    voluntarios: d.data.Voluntarios.slice(1),
-                    tareas: d.data.DB_Tareas.slice(1),
-                    calendario: d.data.DB_Calendario.slice(1),
-                    compras: d.data.DB_Compras.slice(1),
-                    pqr: d.data.DB_PQRS.slice(1)
-                };
-                renderAll();
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-            } catch(e) { console.error(e); }
+    function highlightVol(nombre, inicio, fin, el) {
+        document.querySelectorAll('.vol-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        calendar.gotoDate(inicio);
+        calendar.addEvent({ id: 'temp', title: 'ESTANCIA: ' + nombre, start: inicio, end: fin, display: 'background', color: '#70a1ff' });
+        setTimeout(() => { calendar.getEventById('temp').remove(); }, 5000);
+    }
+
+    function mostrarDetalleDia(fecha) {
+        const eventos = store.DB_Calendario.slice(1).filter(e => e[2] <= fecha && e[3] >= fecha);
+        const presentes = store.Voluntarios.slice(1).filter(v => v[3] <= fecha && v[4] >= fecha);
+        let html = `<b>Eventos:</b> ${eventos.length ? eventos.map(e => e[1]).join(', ') : 'Ninguno'}<br><br>`;
+        html += `<b>Presentes:</b> ${presentes.map(v => v[1]).join(', ')}`;
+        Swal.fire({ title: 'Día: ' + fecha, html: html });
+    }
+
+    async function enviarSolicitudLibre() {
+        const fecha = document.getElementById('sol-fecha').value;
+        const usuario = document.getElementById('sol-voluntario').value;
+        if(!fecha) return;
+        Swal.fire({title: 'Enviando...', didOpen: () => Swal.showLoading()});
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({action: 'solicitarDia', fecha, usuario}) }).then(res => res.json());
+        if(r.status === 'success') {
+            Swal.fire('OK', 'Solicitado', 'success');
+            document.getElementById('sol-fecha').value = '';
+            init();
+        } else {
+            Swal.fire('Error', r.message, 'error');
         }
+    }
 
-        function nav(id, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-            if(id === 'sec-calendario') renderCalendar();
-        }
+    function renderCompras() {
+        const cData = store.DB_Compras.slice(1);
+        document.getElementById('cont-compras').innerHTML = cData.map(c => `<div class="card"><b>${c[1]}:</b> ${c[3]} ${c[4]} - ${c[2]}</div>`).join('');
+    }
 
-        function renderAll() {
-            // Llenar Selects
-            const vHtml = store.voluntarios.map(v => `<option value="${v[1]}">${v[1]}</option>`).join('');
-            ['sol-voluntario', 'com-voluntario', 'pqr-voluntario'].forEach(id => document.getElementById(id).innerHTML = vHtml);
+    async function agregarALista() {
+        const usuario = document.getElementById('com-voluntario').value;
+        const articulo = document.getElementById('com-art').value;
+        const cantidad = document.getElementById('com-cant').value;
+        const unidad = document.getElementById('com-uni').value;
+        if(!articulo) return;
+        await fetch(API, { method: 'POST', body: JSON.stringify({action: 'addCompra', usuario, articulo, cantidad, unidad}) });
+        document.getElementById('com-art').value = '';
+        init();
+    }
 
-            // Render Tareas
-            const tGen = store.tareas.filter(t => t[5] !== 'Hecho');
-            document.getElementById('lista-general').innerHTML = tGen.map(t => `
-                <div class="card">
-                    <div class="task-row">
-                        <div class="priority" style="background:${t[4]=='Alta'?'#ff7675':'#fdcb6e'}"></div>
-                        <span style="flex:1">${t[1]}</span>
-                        <button onclick="completarTarea('${t[0]}')" style="width:auto; padding:5px 10px; font-size:12px; margin:0">Done</button>
-                    </div>
-                </div>
-            `).join('');
+    async function enviarTicket() {
+        const usuario = document.getElementById('pqr-voluntario').value;
+        const tipo = document.getElementById('pqr-tipo').value;
+        const descripcion = document.getElementById('pqr-msg').value;
+        if(!descripcion) return;
+        await fetch(API, { method: 'POST', body: JSON.stringify({action: 'addTicket', usuario, tipo, descripcion}) });
+        document.getElementById('pqr-msg').value = '';
+        Swal.fire('Enviado', 'Ticket creado', 'success');
+        init();
+    }
 
-            // Render Compras Agrupadas
-            const compGroup = {};
-            store.compras.forEach(c => { if(!compGroup[c[1]]) compGroup[c[1]] = []; compGroup[c[1]].push(c); });
-            document.getElementById('cont-compras').innerHTML = Object.keys(compGroup).map(user => `
-                <div class="card">
-                    <h5 style="color:var(--primary)">Lista de ${user}</h5>
-                    ${compGroup[user].map(i => `<div style="font-size:0.9rem; padding:5px 0">• ${i[3]} ${i[4]} - ${i[2]}</div>`).join('')}
-                </div>
-            `).join('');
-
-            // Voluntarios en calendario
-            document.getElementById('vol-list').innerHTML = store.voluntarios.map(v => `
-                <div class="vol-card" onclick="highlightVol('${v[1]}', '${v[3]}', '${v[4]}')">
-                    <span class="vol-name">${v[1]}</span>
-                    <span class="vol-info">${v[2]} (Active til ${v[4]})</span>
-                </div>
-            `).join('');
-        }
-
-        function renderCalendar() {
-            const calEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calEl, {
-                initialView: 'dayGridMonth',
-                locale: 'es',
-                height: 'auto',
-                events: store.calendario.map(e => ({ title: e[1], start: e[2], end: e[3], color: e[4] === 'Rojo' ? '#ff7675' : '#55efc4' }))
-            });
-            calendar.render();
-        }
-
-        async function enviarSolicitudLibre() {
-            const fecha = document.getElementById('sol-fecha').value;
-            if(!fecha) return Swal.fire('Error', 'Select date', 'error');
-            
-            const res = await fetch(API, { method: 'POST', body: JSON.stringify({action: 'solicitarDia', fecha, usuario: document.getElementById('sol-voluntario').value}) });
-            const r = await res.json();
-            
-            if(r.status === 'error') Swal.fire('Blocked / Bloqueado', r.message, 'warning');
-            else { 
-                Swal.fire('Success', 'Requested!', 'success');
-                document.getElementById('sol-fecha').value = '';
-                init();
-            }
-        }
-
-        function limpiarCompras() {
-            Swal.fire({ title: 'Clear all?', showCancelButton: true }).then(async (result) => {
-                if (result.isConfirmed) {
-                    await fetch(API, { method: 'POST', body: JSON.stringify({action: 'limpiarCompras'}) });
-                    init();
-                }
-            });
-        }
-
-        window.onload = init;
-    </script>
+    window.onload = init;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 </body>
 </html>
