@@ -1,263 +1,116 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Masoveria del Bosc 2.0</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #3d5a40; --accent: #70a1ff; --bg: #fdfcf8; --text: #2d3436; --white: #ffffff; --danger: #d63031; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 90px; }
-        
-        /* UI Elements */
-        .section { display: none; padding: 20px; animation: fadeIn 0.3s; }
-        .section.active { display: block; }
-        .card { background: var(--white); border-radius: 15px; padding: 15px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        h2 { color: var(--primary); margin-bottom: 15px; }
-        
-        /* Tareas */
-        .task-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; transition: 0.3s; cursor: pointer; }
-        .task-item.done { opacity: 0.5; text-decoration: line-through; order: 100; }
-        .priority-dot { width: 10px; height: 10px; border-radius: 50%; }
-        
-        /* Calendario */
-        .vol-chip { min-width: 120px; background: #eef2f3; padding: 10px; border-radius: 12px; margin-right: 8px; cursor: pointer; flex-shrink: 0; border: 2px solid transparent; }
-        .vol-chip.active { border-color: var(--accent); background: #e3f2fd; }
-        
-        /* Compras */
-        .user-block { border-left: 4px solid var(--primary); padding-left: 15px; margin-bottom: 20px; }
-        .user-block h4 { color: var(--primary); text-transform: uppercase; font-size: 0.9rem; margin-bottom: 8px; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Masoveria del Bosc</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root { --primary: #3d5a40; --bg: #fdfcf8; --white: #ffffff; }
+    body { font-family: sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
+    
+    /* Tareas con lógica de tu proyecto anterior */
+    .card-custom { 
+      background: white; border-radius: 12px; padding: 15px; margin: 10px;
+      display: flex; align-items: center; transition: all 0.4s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .task-done { text-decoration: line-through; opacity: 0.5; transform: translateX(20px); }
+    
+    .btn-check { 
+      width: 24px; height: 24px; border: 2px solid #ddd; border-radius: 50%; 
+      margin-right: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-check.active { background: #27ae60; border-color: #27ae60; color: white; }
 
-        /* Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; }
-        .nav-item { text-align: center; color: #b2bec3; flex: 1; cursor: pointer; font-size: 0.7rem; font-weight: 600; }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 24px; display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:3000; display:flex; justify-content:center; align-items:center; }
-    </style>
+    /* Nav Inferior */
+    .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 65px; background: white; display: flex; border-top: 1px solid #eee; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: 12px; }
+    .nav-item.active { color: var(--primary); }
+    
+    .section { display: none; padding: 15px; }
+    .section.active { display: block; }
+    
+    #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:1000; display:flex; justify-content:center; align-items:center; }
+  </style>
 </head>
 <body>
 
-<div id="loader"><img src="https://i.gifer.com/ZZ5H.gif" width="40"></div>
+<div id="loader">Cargando Masoveria...</div>
 
 <div id="sec-tareas" class="section active">
-    <h2>Tareas</h2>
-    <div class="card">
-        <h4 style="color: #d35400"><i class="bi bi-pin-angle"></i> Diarias / Fixed Daily</h4>
-        <div id="cont-diarias" style="margin-top:10px"></div>
-    </div>
-    <h4>Generales / General List</h4>
-    <div id="cont-generales" style="display: flex; flex-direction: column;"></div>
-</div>
-
-<div id="sec-calendario" class="section">
-    <h2>Calendario</h2>
-    <div id="vol-list" style="display: flex; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;"></div>
-    <div id="calendar"></div>
-    <div class="card" style="margin-top:20px">
-        <h4>Request Day Off</h4>
-        <select id="sol-voluntario"></select>
-        <input type="date" id="sol-fecha">
-        <button onclick="enviarSolicitudLibre()" style="background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px;">Solicitar / Request</button>
-    </div>
-</div>
-
-<div id="sec-compras" class="section">
-    <h2>Compras</h2>
-    <div class="card" id="listado-compras-agrupado"></div>
-    <div class="card">
-        <h4>Añadir / Add</h4>
-        <select id="com-voluntario"></select>
-        <input type="text" id="com-art" placeholder="Producto">
-        <div style="display:flex; gap:10px">
-            <input type="number" id="com-cant" placeholder="Cant.">
-            <select id="com-uni"><option>un</option><option>kg</option><option>paq</option><option>lts</option></select>
-        </div>
-        <button onclick="agregarALista()" style="background:var(--primary); color:white; width:100%; border:none; padding:12px; border-radius:8px; margin-top:10px">Agregar / Add</button>
-        <button onclick="limpiarCompras()" style="background:var(--danger); color:white; width:100%; border:none; padding:8px; border-radius:8px; margin-top:5px; font-size:0.8rem">Limpiar Todo / Clear All</button>
-    </div>
-</div>
-
-<div id="sec-tickets" class="section">
-    <h2>Tickets</h2>
-    <div id="cont-tickets"></div>
-    <div class="card">
-        <select id="pqr-voluntario"></select>
-        <select id="pqr-tipo">
-            <option value="IP">Ideas / Proyectos</option>
-            <option value="DI">Daño / Incidencia</option>
-            <option value="S">Sugerencia</option>
-        </select>
-        <textarea id="pqr-msg" placeholder="¿Qué sucede?" rows="3" style="width:100%; margin:10px 0; border-radius:8px; padding:10px"></textarea>
-        <button onclick="enviarTicket()" style="background:var(--primary); color:white; width:100%; border:none; padding:12px; border-radius:8px">Crear Ticket</button>
-    </div>
+  <h2 style="color:var(--primary)">Tareas Diarias</h2>
+  <div id="lista-diarias"></div>
+  <h2 style="color:var(--primary); margin-top:30px">Generales</h2>
+  <div id="lista-generales"></div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="nav('sec-tareas', this)"><i class="bi bi-card-checklist"></i><span>Tareas</span></div>
-    <div class="nav-item" onclick="nav('sec-calendario', this)"><i class="bi bi-calendar-range"></i><span>Calendar</span></div>
-    <div class="nav-item" onclick="nav('sec-compras', this)"><i class="bi bi-cart"></i><span>Market</span></div>
-    <div class="nav-item" onclick="nav('sec-tickets', this)"><i class="bi bi-exclamation-triangle"></i><span>Tickets</span></div>
+  <div class="nav-item active" onclick="showSec('sec-tareas')"><i class="bi bi-list-check"></i>Tareas</div>
+  <div class="nav-item" onclick="showSec('sec-calendario')"><i class="bi bi-calendar"></i>Cal</div>
+  <div class="nav-item" onclick="showSec('sec-compras')"><i class="bi bi-cart"></i>Market</div>
 </nav>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbxBK0kLLRFuhectkf2qLbGh8jxggXB5c1C1IyYJYN_CCQ86u-_DnqX7f63ddUIkv0s/exec";
-    let store = {};
-    let calendar;
+  const API_URL = "TU_URL_DE_APPS_SCRIPT";
+  let appData = {};
 
-    async function init() {
-        try {
-            const r = await fetch(API, { method: 'POST', body: JSON.stringify({action: 'getAppData'}) });
-            const d = await r.json();
-            store = d.data;
-            renderAll();
-            document.getElementById('loader').style.display = 'none';
-        } catch(e) { console.error("Error cargando datos", e); }
-    }
+  async function cargarTodo() {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({action: 'obtenerTodo'})
+    });
+    const json = await res.json();
+    appData = json.data;
+    renderTareas();
+    document.getElementById('loader').style.display = 'none';
+  }
 
-    function nav(id, el) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
-        if(id === 'sec-calendario') { setTimeout(() => calendar.render(), 100); }
-    }
+  function renderTareas() {
+    const contenedor = document.getElementById('lista-generales');
+    contenedor.innerHTML = appData.tareasGenerales.map(t => `
+      <div class="card-custom" id="task-${t[0]}">
+        <div class="btn-check" onclick="marcarHecho('${t[0]}', this)"></div>
+        <div>
+          <strong>${t[1]}</strong><br>
+          <small>${t[3]} - Prioridad: ${t[4]}</small>
+        </div>
+      </div>
+    `).join('');
 
-    function renderAll() {
-        const vols = store.Voluntarios.slice(1);
-        const vHtml = vols.map(v => `<option value="${v[1]}">${v[1]}</option>`).join('');
-        ['sol-voluntario', 'com-voluntario', 'pqr-voluntario'].forEach(id => document.getElementById(id).innerHTML = vHtml);
+    document.getElementById('lista-diarias').innerHTML = appData.tareasDiarias.map(t => `
+      <div class="card-custom">
+        <div class="btn-check active"></div>
+        <span><b>${t[2]}:</b> ${t[1]}</span>
+      </div>
+    `).join('');
+  }
 
-        // TAREAS DIARIAS (FIXED)
-        const tAll = store.DB_Tareas.slice(1);
-        document.getElementById('cont-diarias').innerHTML = tAll.filter(t => t[6] === 'Diaria').map(t => `
-            <div class="task-item">
-                <i class="bi bi-check-circle-fill" style="color:var(--primary)"></i>
-                <span><b>${t[2]}:</b> ${t[1]}</span>
-            </div>
-        `).join('');
+  // LÓGICA DE TU PROYECTO ANTERIOR ADAPTADA
+  async function marcarHecho(nombre, btn) {
+    const card = btn.closest('.card-custom');
+    btn.classList.add('active');
+    card.classList.add('task-done');
+    
+    // Llamada al servidor (reemplaza google.script.run)
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({action: 'completarTarea', nombreTarea: nombre})
+    });
 
-        // TAREAS GENERALES
-        document.getElementById('cont-generales').innerHTML = tAll.filter(t => t[6] !== 'Diaria').map(t => `
-            <div class="card task-item ${t[5]=='Hecho'?'done':''}" onclick="toggleTarea('${t[0]}', '${t[5]}')">
-                <div class="priority-dot" style="background:${t[4]=='Alta'?'red':'orange'}"></div>
-                <div style="flex:1">
-                    <div>${t[1]}</div>
-                    <small style="color:#888">${t[3] || 'Sin fecha'} | Prioridad: ${t[4]}</small>
-                </div>
-                <i class="bi ${t[5]=='Hecho'?'bi-check-square-fill':'bi-square'}"></i>
-            </div>
-        `).join('');
+    setTimeout(() => {
+      card.style.opacity = '0';
+      setTimeout(() => card.style.display = 'none', 400);
+    }, 1500);
+  }
 
-        // COMPRAS AGRUPADAS
-        const cData = store.DB_Compras.slice(1);
-        const grouped = {};
-        cData.forEach(c => { if(!grouped[c[1]]) grouped[c[1]] = []; grouped[c[1]].push(c); });
-        document.getElementById('listado-compras-agrupado').innerHTML = Object.keys(grouped).length ? 
-            Object.keys(grouped).map(user => `
-                <div class="user-block">
-                    <h4>Lista de ${user}</h4>
-                    ${grouped[user].map(i => `<div style="padding:4px 0">• ${i[3]} ${i[4]} de ${i[2]}</div>`).join('')}
-                </div>
-            `).join('') : "No hay artículos / No items";
+  function showSec(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
 
-        // TICKETS
-        document.getElementById('cont-tickets').innerHTML = store.DB_PQRS.slice(1).filter(p => p[5] !== 'Completado').map(p => `
-            <div class="card">
-                <div style="display:flex; justify-content:space-between">
-                    <b>${p[3]}</b> <small>${p[2]}</small>
-                </div>
-                <p style="margin-top:5px; font-size:0.9rem">${p[4]}</p>
-            </div>
-        `).join('');
-
-        renderCalendar(vols);
-    }
-
-    function renderCalendar(vols) {
-        document.getElementById('vol-list').innerHTML = vols.map(v => `
-            <div class="vol-chip" onclick="focusVol('${v[3]}')">
-                <b>${v[1]}</b><br><small>Hasta: ${v[4]}</small>
-            </div>
-        `).join('');
-
-        const calEl = document.getElementById('calendar');
-        calendar = new FullCalendar.Calendar(calEl, {
-            initialView: 'dayGridMonth', locale: 'es', height: 400,
-            events: store.DB_Calendario.slice(1).map(e => ({ title: e[1], start: e[2], end: e[3], color: e[4] === 'Verde' ? '#27ae60' : '#d63031' })),
-            dateClick: (info) => mostrarDetalleDia(info.dateStr)
-        });
-        calendar.render();
-    }
-
-    function focusVol(fecha) { calendar.gotoDate(fecha); }
-
-    function mostrarDetalleDia(fecha) {
-        const eventos = store.DB_Calendario.slice(1).filter(e => e[2] <= fecha && e[3] >= fecha);
-        const presentes = store.Voluntarios.slice(1).filter(v => {
-            const start = v[3]; const end = v[4];
-            return fecha >= start && fecha <= end;
-        });
-        
-        let msg = `<b>Presentes:</b><br>${presentes.map(v => "• " + v[1]).join('<br>') || 'Nadie'}<br><br>`;
-        msg += `<b>Eventos/Estado:</b><br>${eventos.map(e => "• " + e[1]).join('<br>') || 'Día Laboral'}`;
-        
-        Swal.fire({ title: 'Info: ' + fecha, html: msg, confirmButtonColor: '#3d5a40' });
-    }
-
-    async function enviarSolicitudLibre() {
-        const f = document.getElementById('sol-fecha').value;
-        const u = document.getElementById('sol-voluntario').value;
-        if(!f) return;
-        
-        Swal.fire({ title: 'Verificando...', didOpen: () => Swal.showLoading() });
-        const resp = await fetch(API, { method: 'POST', body: JSON.stringify({action: 'solicitarDia', fecha: f, usuario: u}) }).then(r => r.json());
-        
-        if(resp.status === 'success') {
-            Swal.fire('Éxito', 'Día libre registrado', 'success');
-            init();
-        } else {
-            Swal.fire('Bloqueado', resp.message, 'warning');
-        }
-    }
-
-    async function agregarALista() {
-        const u = document.getElementById('com-voluntario').value;
-        const a = document.getElementById('com-art').value;
-        const c = document.getElementById('com-cant').value;
-        const n = document.getElementById('com-uni').value;
-        if(!a) return;
-        await fetch(API, { method: 'POST', body: JSON.stringify({action: 'addCompra', usuario: u, articulo: a, cantidad: c, unidad: n}) });
-        document.getElementById('com-art').value = '';
-        init();
-    }
-
-    async function enviarTicket() {
-        const u = document.getElementById('pqr-voluntario').value;
-        const t = document.getElementById('pqr-tipo').value;
-        const m = document.getElementById('pqr-msg').value;
-        if(!m) return;
-        await fetch(API, { method: 'POST', body: JSON.stringify({action: 'addTicket', usuario: u, tipo: t, descripcion: m}) });
-        document.getElementById('pqr-msg').value = '';
-        Swal.fire('Enviado', 'Gracias por tu reporte', 'success');
-        init();
-    }
-
-    async function limpiarCompras() {
-        const confirm = await Swal.fire({ title: '¿Borrar todo?', showCancelButton: true });
-        if(confirm.isConfirmed) {
-            await fetch(API, { method: 'POST', body: JSON.stringify({action: 'limpiarCompras'}) });
-            init();
-        }
-    }
-
-    window.onload = init;
+  window.onload = cargarTodo;
 </script>
 </body>
 </html>
