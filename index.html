@@ -1,243 +1,57 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Masoveria del Bosc</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <title>Test Masoveria</title>
     <style>
-        :root {
-            --primary: #3d5a40;
-            --bg: #fdfcf8;
-            --text: #2d3436;
-            --white: #ffffff;
-            --danger: #d63031;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
-
-        /* Pantalla de Carga */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--white); z-index: 2000; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-
-        /* Tareas Estilo HabitNow / Tu proyecto anterior */
-        .section { display: none; padding: 20px; animation: fadeIn 0.3s; }
-        .section.active { display: block; }
-
-        h2 { color: var(--primary); font-size: 1.4rem; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-
-        .card-custom {
-            background: var(--white); border-radius: 14px; padding: 16px;
-            margin-bottom: 12px; display: flex; align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            transition: all 0.5s ease;
-        }
-
-        .task-done { 
-            text-decoration: line-through; 
-            opacity: 0.4; 
-            transform: translateX(30px); 
-        }
-
-        .btn-check {
-            width: 26px; height: 26px; border: 2px solid #cbd5e0;
-            border-radius: 50%; margin-right: 15px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; cursor: pointer;
-        }
-
-        .btn-check.active {
-            background: #27ae60; border-color: #27ae60; color: white;
-        }
-
-        .task-info b { display: block; font-size: 1rem; }
-        .task-info small { color: #718096; font-size: 0.8rem; }
-
-        .priority-badge {
-            margin-left: auto; font-size: 0.7rem; padding: 3px 8px;
-            border-radius: 6px; color: white; text-transform: uppercase;
-        }
-        .bg-alta { background: #e53e3e; }
-        .bg-media { background: #ed8936; }
-
-        /* Compras Agrupadas */
-        .user-block { margin-bottom: 20px; border-left: 4px solid var(--primary); padding-left: 15px; }
-        .user-title { font-weight: 600; color: var(--primary); font-size: 0.9rem; margin-bottom: 8px; }
-
-        /* Nav Inferior */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: var(--white); display: flex; border-top: 1px solid #edf2f7;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.03); z-index: 1000;
-        }
-        .nav-item {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; color: #a0aec0;
-            font-size: 0.75rem; font-weight: 600; cursor: pointer;
-        }
-        .nav-item.active { color: var(--primary); }
-        .nav-item i { font-size: 1.4rem; margin-bottom: 4px; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { font-family: sans-serif; padding: 20px; background: #fdfcf8; }
+        .tarea { background: white; padding: 15px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; }
+        .btn { background: #3d5a40; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+        #loader { color: #3d5a40; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="margin-top: 15px; color: var(--primary); font-weight: 600;">Cargando Masoveria...</p>
-    </div>
-
-    <div id="sec-tareas" class="section active">
-        <h2>Tareas Diarias</h2>
-        <div id="lista-diarias"></div>
-        
-        <h2 style="margin-top: 30px;">Tareas Generales</h2>
-        <div id="lista-generales"></div>
-    </div>
-
-    <div id="sec-compras" class="section">
-        <h2>Lista de Compras</h2>
-        <div id="cont-compras"></div>
-        </div>
-
-    <div id="sec-tickets" class="section">
-        <h2>Tickets Activos</h2>
-        <div id="cont-tickets"></div>
-    </div>
-
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="showSec('sec-tareas', this)">
-            <i class="bi bi-check2-all"></i><span>Tareas</span>
-        </div>
-        <div class="nav-item" onclick="showSec('sec-compras', this)">
-            <i class="bi bi-cart3"></i><span>Compras</span>
-        </div>
-        <div class="nav-item" onclick="showSec('sec-tickets', this)">
-            <i class="bi bi-megaphone"></i><span>Tickets</span>
-        </div>
-    </nav>
-
-    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <h2>Mis Tareas Generales</h2>
+    <div id="loader">Conectando con Google Sheets...</div>
+    <div id="lista"></div>
 
     <script>
-        // PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT
-        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI"; 
-        
-        let appData = {};
+        // PEGA TU URL AQUÍ
+        const URL_GAS = "TU_URL_DE_APPS_SCRIPT_AQUI";
 
-        // Iniciar App
-        async function init() {
+        async function cargar() {
             try {
-                // Usamos GET para evitar problemas de CORS
-                const response = await fetch(API_URL + "?action=obtenerTodo");
-                const result = await response.json();
-                
-                if (result.status === "success") {
-                    appData = result.data;
-                    renderTareas();
-                    renderCompras();
-                    renderTickets();
-                    document.getElementById('loader').style.display = 'none';
-                }
-            } catch (error) {
-                console.error("Error cargando datos:", error);
-                document.getElementById('loader').innerHTML = "<p>Error de conexión.<br>Verifica la URL en GitHub.</p>";
-            }
-        }
+                const res = await fetch(URL_GAS);
+                const objeto = await res.json();
+                const tareas = objeto.data.tareasGenerales;
 
-        function showSec(id, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            el.classList.add('active');
-        }
+                let html = "";
+                tareas.forEach(t => {
+                    html += `
+                        <div class="tarea">
+                            <span><b>${t[1]}</b><br><small>${t[3]}</small></span>
+                            <button class="btn" onclick="terminar('${t[1]}')">Hecho</button>
+                        </div>
+                    `;
+                });
 
-        function renderTareas() {
-            // Render Diarias (Solo lectura con check verde)
-            document.getElementById('lista-diarias').innerHTML = appData.tareasDiarias.map(t => `
-                <div class="card-custom">
-                    <div class="btn-check active"><i class="bi bi-check"></i></div>
-                    <div class="task-info">
-                        <b>${t[1]}</b>
-                        <small>Responsable: ${t[2]}</small>
-                    </div>
-                </div>
-            `).join('');
+                document.getElementById('lista').innerHTML = html;
+                document.getElementById('loader').style.display = 'none';
 
-            // Render Generales (Interactuables como tu proyecto anterior)
-            document.getElementById('lista-generales').innerHTML = appData.tareasGenerales.map(t => `
-                <div class="card-custom" id="task-card-${t[0]}">
-                    <div class="btn-check" onclick="completarTarea('${t[0]}', this)"></div>
-                    <div class="task-info">
-                        <b>${t[1]}</b>
-                        <small>${t[3]} | Prioridad: ${t[4]}</small>
-                    </div>
-                    <div class="priority-badge ${t[4].toLowerCase() === 'alta' ? 'bg-alta' : 'bg-media'}">${t[4]}</div>
-                </div>
-            `).join('');
-        }
-
-        // FUNCIÓN TACHADO (Tu lógica anterior adaptada)
-        async function completarTarea(nombreTarea, btn) {
-            const card = document.getElementById('task-card-' + nombreTarea);
-            
-            // Efecto visual inmediato
-            btn.classList.add('active');
-            btn.innerHTML = '<i class="bi bi-check"></i>';
-            card.classList.add('task-done');
-
-            // Llamada al servidor
-            try {
-                // Enviar a Google
-                await fetch(API_URL + "?action=completarTarea&nombreTarea=" + encodeURIComponent(nombreTarea));
-                
-                // Desvanecer y eliminar después de 1.5s
-                setTimeout(() => {
-                    card.style.opacity = '0';
-                    setTimeout(() => card.style.display = 'none', 500);
-                }, 1500);
             } catch (e) {
-                console.error("Error al completar", e);
+                document.getElementById('loader').innerHTML = "Error: No se pudo cargar la info.";
+                console.error(e);
             }
         }
 
-        function renderCompras() {
-            const grouped = {};
-            appData.compras.forEach(c => {
-                if(c[3] === "PENDIENTE") {
-                    if(!grouped[c[1]]) grouped[c[1]] = [];
-                    grouped[c[1]].push(c);
-                }
-            });
-
-            document.getElementById('cont-compras').innerHTML = Object.keys(grouped).map(user => `
-                <div class="user-block">
-                    <div class="user-title">LISTA DE ${user.toUpperCase()}</div>
-                    ${grouped[user].map(item => `<div style="padding:4px 0;">• ${item[2]} (${item[4]})</div>`).join('')}
-                </div>
-            `).join('') || "No hay compras pendientes.";
+        async function terminar(nombre) {
+            alert("Marcando: " + nombre);
+            await fetch(URL_GAS + "?action=completarTarea&nombreTarea=" + encodeURIComponent(nombre));
+            location.reload(); // Recarga para ver que desaparece
         }
 
-        function renderTickets() {
-            document.getElementById('cont-tickets').innerHTML = appData.tickets.map(t => `
-                <div class="card-custom">
-                    <div class="task-info">
-                        <b style="color:var(--danger)">[${t[2]}] ${t[1]}</b>
-                        <p style="margin:5px 0 0; font-size:0.85rem;">${t[3]}</p>
-                    </div>
-                </div>
-            `).join('') || "Sin tickets abiertos.";
-        }
-
-        window.onload = init;
+        cargar();
     </script>
 </body>
 </html>
